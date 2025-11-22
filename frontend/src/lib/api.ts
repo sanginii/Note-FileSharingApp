@@ -1,5 +1,6 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
-
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:3001/api";
+// url
 export interface CreateNoteRequest {
   encryptedData: string;
   encryptedKey: string;
@@ -33,25 +34,33 @@ export interface NoteResponse {
 /**
  * Create a new encrypted note
  */
-export async function createNote(data: CreateNoteRequest): Promise<CreateNoteResponse> {
+export async function createNote(
+  data: CreateNoteRequest
+): Promise<CreateNoteResponse> {
   const response = await fetch(`${API_BASE_URL}/notes`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
   });
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ error: 'Failed to create note' }));
-    
+    const errorData = await response
+      .json()
+      .catch(() => ({ error: "Failed to create note" }));
+
     // If there are validation details, include them in the error
     if (errorData.details && Array.isArray(errorData.details)) {
-      const details = errorData.details.map((d: any) => `${d.path.join('.')}: ${d.message}`).join(', ');
-      throw new Error(`${errorData.error || 'Invalid request data'}: ${details}`);
+      const details = errorData.details
+        .map((d: any) => `${d.path.join(".")}: ${d.message}`)
+        .join(", ");
+      throw new Error(
+        `${errorData.error || "Invalid request data"}: ${details}`
+      );
     }
-    
-    throw new Error(errorData.error || 'Failed to create note');
+
+    throw new Error(errorData.error || "Failed to create note");
   }
 
   return response.json();
@@ -60,29 +69,34 @@ export async function createNote(data: CreateNoteRequest): Promise<CreateNoteRes
 /**
  * Get an encrypted note by ID
  */
-export async function getNote(id: string, password?: string): Promise<NoteResponse> {
+export async function getNote(
+  id: string,
+  password?: string
+): Promise<NoteResponse> {
   const url = new URL(`${API_BASE_URL}/notes/${id}`);
   if (password) {
-    url.searchParams.append('password', password);
+    url.searchParams.append("password", password);
   }
   const response = await fetch(url.toString());
 
   if (!response.ok) {
     if (response.status === 404) {
-      throw new Error('Note not found');
+      throw new Error("Note not found");
     }
     if (response.status === 401) {
       const data = await response.json().catch(() => ({}));
       if (data.requiresPassword) {
-        throw new Error('PASSWORD_REQUIRED');
+        throw new Error("PASSWORD_REQUIRED");
       }
-      throw new Error('Invalid password');
+      throw new Error("Invalid password");
     }
     if (response.status === 410) {
-      throw new Error('Note has expired or been destroyed');
+      throw new Error("Note has expired or been destroyed");
     }
-    const error = await response.json().catch(() => ({ error: 'Failed to fetch note' }));
-    throw new Error(error.error || 'Failed to fetch note');
+    const error = await response
+      .json()
+      .catch(() => ({ error: "Failed to fetch note" }));
+    throw new Error(error.error || "Failed to fetch note");
   }
 
   return response.json();
@@ -93,11 +107,10 @@ export async function getNote(id: string, password?: string): Promise<NoteRespon
  */
 export async function deleteNote(id: string): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/notes/${id}`, {
-    method: 'DELETE',
+    method: "DELETE",
   });
 
   if (!response.ok) {
-    throw new Error('Failed to delete note');
+    throw new Error("Failed to delete note");
   }
 }
-
