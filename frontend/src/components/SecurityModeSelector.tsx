@@ -1,4 +1,4 @@
-import { useSecurityStore, SecurityMode } from '../store/securityStore';
+import { useSecurityStore } from "../store/securityStore";
 
 export function SecurityModeSelector() {
   const { mode, setMode } = useSecurityStore();
@@ -10,11 +10,11 @@ export function SecurityModeSelector() {
       </label>
       <div className="flex space-x-4">
         <button
-          onClick={() => setMode('warnings')}
+          onClick={() => setMode("warnings")}
           className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors border-2 font-mono ${
-            mode === 'warnings'
-              ? 'bg-terminal-bg text-terminal-green border-terminal-green'
-              : 'bg-terminal-bg text-terminal-green-dim border-terminal-green-dark hover:border-terminal-green'
+            mode === "warnings"
+              ? "bg-terminal-bg text-terminal-green border-terminal-green"
+              : "bg-terminal-bg text-terminal-green-dim border-terminal-green-dark hover:border-terminal-green"
           }`}
         >
           &gt; WARNINGS
@@ -23,11 +23,11 @@ export function SecurityModeSelector() {
           </span>
         </button>
         <button
-          onClick={() => setMode('strict')}
+          onClick={() => setMode("strict")}
           className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors border-2 font-mono ${
-            mode === 'strict'
-              ? 'bg-terminal-bg text-terminal-green border-terminal-green'
-              : 'bg-terminal-bg text-terminal-green-dim border-terminal-green-dark hover:border-terminal-green'
+            mode === "strict"
+              ? "bg-terminal-bg text-terminal-green border-terminal-green"
+              : "bg-terminal-bg text-terminal-green-dim border-terminal-green-dark hover:border-terminal-green"
           }`}
         >
           &gt; STRICT

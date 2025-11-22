@@ -16,43 +16,46 @@ export interface EncryptionResult {
 export async function generateKey(): Promise<CryptoKey> {
   return crypto.subtle.generateKey(
     {
-      name: 'AES-GCM',
+      name: "AES-GCM",
       length: 256,
     },
     true, // extractable
-    ['encrypt', 'decrypt']
+    ["encrypt", "decrypt"]
   );
 }
 
 /**
  * Encrypt data using AES-256-GCM
  */
-export async function encrypt(data: string | ArrayBuffer): Promise<EncryptionResult> {
+export async function encrypt(
+  data: string | ArrayBuffer
+): Promise<EncryptionResult> {
   const key = await generateKey();
   const iv = crypto.getRandomValues(new Uint8Array(12)); // 96-bit IV for GCM
-  
-  const dataArray = typeof data === 'string' 
-    ? new TextEncoder().encode(data) 
-    : data;
+
+  const dataArray =
+    typeof data === "string" ? new TextEncoder().encode(data) : data;
 
   const encrypted = await crypto.subtle.encrypt(
     {
-      name: 'AES-GCM',
+      name: "AES-GCM",
       iv: iv,
-      tagLength: 128, // 128-bit authentication tag
+      tagLength: 128,
     },
     key,
     dataArray
   );
 
-  // Extract the encrypted data and auth tag
-  // In GCM, the auth tag is appended to the ciphertext
-  const authTagLength = 16; // 128 bits = 16 bytes
-  const encryptedData = encrypted.slice(0, encrypted.byteLength - authTagLength);
+  // Split ciphertext and auth tag
+  const authTagLength = 16; // 128 bits
+  const encryptedData = encrypted.slice(
+    0,
+    encrypted.byteLength - authTagLength
+  );
   const authTag = encrypted.slice(encrypted.byteLength - authTagLength);
 
-  // Export the key
-  const exportedKey = await crypto.subtle.exportKey('raw', key);
+  // Export key
+  const exportedKey = await crypto.subtle.exportKey("raw", key);
 
   return {
     encryptedData: arrayBufferToBase64(encryptedData),
@@ -73,50 +76,49 @@ export async function decrypt(
 ): Promise<string | ArrayBuffer> {
   const keyData = base64ToArrayBuffer(keyBase64);
   const key = await crypto.subtle.importKey(
-    'raw',
+    "raw",
     keyData,
-    { name: 'AES-GCM' },
+    { name: "AES-GCM" },
     false,
-    ['decrypt']
+    ["decrypt"]
   );
 
   const ivArray = base64ToArrayBuffer(iv);
   const encryptedArray = base64ToArrayBuffer(encryptedData);
   const tagArray = base64ToArrayBuffer(authTag);
 
-  // Combine encrypted data and auth tag for GCM decryption
-  const combined = new Uint8Array(encryptedArray.byteLength + tagArray.byteLength);
+  // Combine ciphertext + auth tag
+  const combined = new Uint8Array(
+    encryptedArray.byteLength + tagArray.byteLength
+  );
   combined.set(new Uint8Array(encryptedArray), 0);
   combined.set(new Uint8Array(tagArray), encryptedArray.byteLength);
 
   try {
     const decrypted = await crypto.subtle.decrypt(
-      {
-        name: 'AES-GCM',
-        iv: ivArray,
-        tagLength: 128,
-      },
+      { name: "AES-GCM", iv: ivArray, tagLength: 128 },
       key,
-      combined
+      combined.buffer
     );
 
-    // Try to decode as text, if it fails, return as ArrayBuffer
     try {
       return new TextDecoder().decode(decrypted);
     } catch {
       return decrypted;
     }
-  } catch (error) {
-    throw new Error('Decryption failed. The data may be corrupted or the key is incorrect.');
+  } catch {
+    throw new Error(
+      "Decryption failed. Data may be corrupted or key is incorrect."
+    );
   }
 }
 
 /**
- * Convert ArrayBuffer to Base64
+ * Convert ArrayBuffer or TypedArray to Base64
  */
-function arrayBufferToBase64(buffer: ArrayBuffer): string {
-  const bytes = new Uint8Array(buffer);
-  let binary = '';
+function arrayBufferToBase64(buffer: ArrayBuffer | Uint8Array): string {
+  const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
+  let binary = "";
   for (let i = 0; i < bytes.byteLength; i++) {
     binary += String.fromCharCode(bytes[i]);
   }
@@ -127,18 +129,13 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
  * Convert Base64 to ArrayBuffer
  */
 function base64ToArrayBuffer(base64: string): ArrayBuffer {
-  try {
-    // Clean the base64 string (remove any whitespace or invalid characters)
-    const cleanedBase64 = base64.replace(/[^A-Za-z0-9+/=]/g, '');
-    const binary = atob(cleanedBase64);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) {
-      bytes[i] = binary.charCodeAt(i);
-    }
-    return bytes.buffer;
-  } catch (error) {
-    throw new Error(`Invalid base64 string: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  const cleaned = base64.replace(/[^A-Za-z0-9+/=]/g, "");
+  const binary = atob(cleaned);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
   }
+  return bytes.buffer;
 }
 
 /**
@@ -152,5 +149,3 @@ export async function fileToArrayBuffer(file: File): Promise<ArrayBuffer> {
     reader.readAsArrayBuffer(file);
   });
 }
-
-

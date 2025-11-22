@@ -1,4 +1,4 @@
-import { ThreatAnalysis, getRiskColor, getRiskIcon } from '../lib/threatDetection';
+import { ThreatAnalysis, getRiskIcon } from "../lib/threatDetection";
 
 interface RiskMeterProps {
   analysis: ThreatAnalysis;
@@ -11,8 +11,12 @@ export function RiskMeter({ analysis, showDetails = true }: RiskMeterProps) {
   return (
     <div className="bg-terminal-bg border-2 border-terminal-green rounded-lg p-6 font-mono">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-terminal-green">&gt; SECURITY RISK ASSESSMENT</h3>
-        <span className={`px-3 py-1 rounded-full text-sm font-medium border-2 border-terminal-green text-white`}>
+        <h3 className="text-lg font-semibold text-terminal-green">
+          &gt; SECURITY RISK ASSESSMENT
+        </h3>
+        <span
+          className={`px-3 py-1 rounded-full text-sm font-medium border-2 border-terminal-green text-white`}
+        >
           {getRiskIcon(riskLevel)} {riskLevel.toUpperCase()}
         </span>
       </div>
@@ -26,7 +30,11 @@ export function RiskMeter({ analysis, showDetails = true }: RiskMeterProps) {
         <div className="w-full bg-terminal-bg border-2 border-terminal-green rounded-full h-3 overflow-hidden">
           <div
             className={`h-full transition-all duration-300 ${
-              riskScore >= 70 ? 'bg-terminal-green-bright' : riskScore >= 40 ? 'bg-terminal-green' : 'bg-terminal-green-dim'
+              riskScore >= 70
+                ? "bg-terminal-green-bright"
+                : riskScore >= 40
+                ? "bg-terminal-green"
+                : "bg-terminal-green-dim"
             }`}
             style={{ width: `${riskScore}%` }}
           />
@@ -36,7 +44,9 @@ export function RiskMeter({ analysis, showDetails = true }: RiskMeterProps) {
       {/* Alerts */}
       {showDetails && alerts.length > 0 && (
         <div className="space-y-2">
-          <h4 className="text-sm font-semibold text-terminal-green">&gt; DETECTED ISSUES:</h4>
+          <h4 className="text-sm font-semibold text-terminal-green">
+            &gt; DETECTED ISSUES:
+          </h4>
           {alerts.map((alert, index) => (
             <div
               key={index}
@@ -44,15 +54,21 @@ export function RiskMeter({ analysis, showDetails = true }: RiskMeterProps) {
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-terminal-green">{alert.message}</p>
-                  <p className="text-xs text-terminal-green-dim mt-1">{alert.suggestion}</p>
+                  <p className="text-sm font-medium text-terminal-green">
+                    {alert.message}
+                  </p>
+                  <p className="text-xs text-terminal-green-dim mt-1">
+                    {alert.suggestion}
+                  </p>
                   {alert.pattern && (
                     <p className="text-xs text-terminal-green-dark mt-1 font-mono">
                       Found: {alert.pattern.substring(0, 30)}...
                     </p>
                   )}
                 </div>
-                <span className={`ml-2 px-2 py-1 rounded text-xs font-medium border border-terminal-green text-terminal-green`}>
+                <span
+                  className={`ml-2 px-2 py-1 rounded text-xs font-medium border border-terminal-green text-terminal-green`}
+                >
                   {alert.category}
                 </span>
               </div>
