@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: 'Courier New', 'Monaco', 'Menlo', 'Consolas', 'Liberation Mono', monospace;
+  background-color: #000000;
+  color: #00ff00;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: 'Courier New', 'Monaco', 'Menlo', 'Consolas', 'Liberation Mono', monospace;
+}
+
+/* Terminal theme for form elements */
+input, textarea, select {
+  background-color: #000000;
+  color: #00ff00;
+  border-color: #00ff00;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #008800;
+  opacity: 0.6;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: #00ff88;
+  box-shadow: 0 0 0 2px rgba(0, 255, 0, 0.2);
+}
+
+/* Radio and checkbox styling */
+input[type="radio"], input[type="checkbox"] {
+  accent-color: #00ff00;
+}
+
+

@@ -1,0 +1,33 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model SecureNote {
+  id            String   @id @default(cuid())
+  encryptedData String   // Base64 encrypted content
+  encryptedKey  String   // Base64 encrypted key (for additional security layer)
+  iv            String   // Base64 initialization vector
+  authTag       String   // Base64 authentication tag
+  expiresAt     DateTime? // Nullable for view-based expiry
+  maxViews      Int      @default(0) // 0 means no limit
+  viewCount     Int      @default(0)
+  isFile        Boolean  @default(false)
+  fileName      String?  // Original file name if it's a file
+  mimeType      String?  // MIME type for files
+  passwordHash  String?  // Hashed password for password-protected notes
+  salt          String?  // Salt for password hashing
+  createdAt     DateTime @default(now())
+  destroyed     Boolean  @default(false)
+  
+  @@index([id])
+  @@index([createdAt])
+}
+
